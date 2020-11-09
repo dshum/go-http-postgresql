@@ -10,13 +10,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-type Person struct {
-	ID        string `json:"id"`
-	FirstName string `json:"first_name,omitempty"`
-	LastName  string `json:"last_name,omitempty"`
-	Email     string `json:"email,omitempty"`
-}
-
 func main() {
 	db := db.Connect("postgres", "host=db port=5432 user=postgres password=secret dbname=go_test1 sslmode=disable")
 	defer db.Close()

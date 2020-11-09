@@ -1,0 +1,21 @@
+version: '3'
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_DB: go_test1
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
+    ports:
+      - 5432:5432
+  app:
+    build: .
+    command: ["go", "run", "cmd/main.go"]
+    volumes:
+      - .:/go/src/app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    links:
+      - db

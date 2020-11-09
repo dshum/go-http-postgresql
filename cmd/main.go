@@ -25,9 +25,9 @@ func main() {
 
 	router.GET("/", server.Welcome)
 	router.GET("/users", server.GetUsers)
-	router.PUT("/users", server.CreateUser)
+	router.POST("/users", server.CreateUser)
 	router.GET("/users/:id", server.GetUser)
-	router.POST("/users/:id", server.UpdateUser)
+	router.PUT("/users/:id", server.UpdateUser)
 	router.DELETE("/users/:id", server.DeleteUser)
 
 	log.Fatal(http.ListenAndServe(":8080", router))

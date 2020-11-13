@@ -59,7 +59,7 @@ func (service *UsersService) GetUsers(w http.ResponseWriter, r *http.Request, _ 
 	people := []models.Person{}
 	err := service.db.Select(&people, "SELECT * FROM persons ORDER BY id ASC")
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(newResponseError(err))
 		return
@@ -75,7 +75,7 @@ func (service *UsersService) GetUser(w http.ResponseWriter, r *http.Request, par
 
 	idInt, err := strconv.Atoi(id)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err, id)
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(newResponseError(err))
 		return
@@ -85,7 +85,7 @@ func (service *UsersService) GetUser(w http.ResponseWriter, r *http.Request, par
 	err = service.db.Get(&person, "SELECT * FROM persons WHERE id = $1 LIMIT 1", idInt)
 	if err != nil {
 		err := errors.PersonNotFound("Person not found")
-		log.Fatal(err)
+		log.Println(err, idInt)
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(newResponseError(err))
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -102,7 +102,7 @@ func (service *UsersService) UpdateUser(w http.ResponseWriter, r *http.Request, 
 
 	idInt, err := strconv.Atoi(id)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err, id)
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(newResponseError(err))
 		return
@@ -113,13 +113,14 @@ func (service *UsersService) UpdateUser(w http.ResponseWriter, r *http.Request, 
 	err = service.db.Get(&person, "SELECT * FROM persons WHERE id = $1 LIMIT 1", idInt)
 	if err != nil {
 		err := errors.PersonNotFound("Person not found")
-		log.Fatal(err)
+		log.Println(err, idInt)
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(newResponseError(err))
 		return
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&person); err != nil {
+		log.Println(err, r.Body)
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(newResponseError(err))
 		return
@@ -127,7 +128,7 @@ func (service *UsersService) UpdateUser(w http.ResponseWriter, r *http.Request, 
 
 	_, err = service.db.NamedExec("UPDATE persons SET first_name = :first_name, last_name = :last_name, email = :email WHERE id = :id", person)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err, person)
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(newResponseError(err))
 		return
@@ -142,6 +143,7 @@ func (service *UsersService) CreateUser(w http.ResponseWriter, r *http.Request, 
 	var person models.Person
 
 	if err := json.NewDecoder(r.Body).Decode(&person); err != nil {
+		log.Println(err, r.Body)
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(newResponseError(err))
 		return
@@ -150,7 +152,7 @@ func (service *UsersService) CreateUser(w http.ResponseWriter, r *http.Request, 
 	sql := "INSERT INTO persons (first_name, last_name, email) VALUES ($1, $2, $3) RETURNING id"
 	err := service.db.QueryRow(sql, person.FirstName, person.LastName, person.Email).Scan(&person.ID)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err, person)
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(newResponseError(err))
 		return
@@ -166,7 +168,7 @@ func (service *UsersService) DeleteUser(w http.ResponseWriter, r *http.Request, 
 
 	idInt, err := strconv.Atoi(id)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err, id)
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(newResponseError(err))
 		return
@@ -176,7 +178,7 @@ func (service *UsersService) DeleteUser(w http.ResponseWriter, r *http.Request, 
 	err = service.db.Get(&person, "SELECT * FROM persons WHERE id = $1 LIMIT 1", idInt)
 	if err != nil {
 		err := errors.PersonNotFound("Person not found")
-		log.Fatal(err)
+		log.Println(err, idInt)
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(newResponseError(err))
 		return
@@ -184,7 +186,7 @@ func (service *UsersService) DeleteUser(w http.ResponseWriter, r *http.Request, 
 
 	_, err = service.db.NamedExec("DELETE FROM persons WHERE id = :id", person)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err, person)
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(newResponseError(err))
 		return
